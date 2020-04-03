@@ -46,3 +46,34 @@ server.post('/users', checkUserExists, (req, res) => {
 ```
 
 - Para utilizar apenas adicionar o middleware após o nome da rota.
+
+- Também o middleware consegue alterar/adicionar o valor de uma variavel da `req`:
+
+```js
+//Middleware
+function checkUserExistsInArray(req, res, next) {
+    const {index} = req.params;
+
+    const user = users[index];
+
+    console.log(typeof users[index]);
+    
+    if (typeof users[index] == 'undefined') {
+        console.log(typeof users[index], 'entrou aqui');
+        return res.status(404).json({ error: 'usuario não encontrado'});
+    }
+
+    // adicionar user para variavel req
+    req.user = user;
+
+    return next();
+}
+```
+
+- Utilizando a variavel criada no middleware:
+
+```js
+server.get('/users/:index', checkUserExistsInArray, (req, res) => {
+    return res.json(req.user);
+});
+```
